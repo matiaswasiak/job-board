@@ -33,8 +33,11 @@ app.post("/login", async (req, res) => {
 });
 
 const typeDefs = await readFile("./schema.graphql", "utf8");
-const context = () => {
-  weather: "rainy";
+const context = async ({ req }) => {
+  if (req.auth) {
+    const user = await User.findById(req.auth.sub);
+    return { user };
+  }
 };
 const apolloServer = new ApolloServer({ typeDefs, resolvers, context });
 await apolloServer.start();
